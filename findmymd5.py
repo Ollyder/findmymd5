@@ -35,9 +35,11 @@ class HASHCRACK():
 
 
 def isSuccess(answer):
+    global md5
     m = hashlib.md5()
-    md5s = m.update(answer).hedigest()
-    if(md5s != md5):
+    m.update(answer.encode())
+    m = m.hexdigest()
+    if(m != md5):
         raise Exception
 
 
@@ -51,10 +53,14 @@ def main():
         try:
             answer = cracker.crack(hashValue=md5)
             isSuccess(answer)
-            print(answer)
-        except:
-            pass
+            print('done!')
+            print('the answer is %s' % answer)
+            exit(0)
+        except Exception as e:
+            print('fail!')
+            continue
 
+    print('No Found This Md5!')
 
 if __name__ == '__main__':
     main()
