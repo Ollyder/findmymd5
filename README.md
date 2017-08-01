@@ -13,3 +13,4 @@ py3.x
 # 目前已经更新的网站
 * [hashtoolkit](http://hashtoolkit.com)
 * [hashcrack](http://hashcrack.com)
+* [cmd5](http://www.cmd5.org)
