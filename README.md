@@ -16,3 +16,4 @@ py3.x
 * [cmd5](http://www.cmd5.org)
 * [dmd5](http://www.dmd5.com)
 * [pmd5](http://pmd5.com/#)
+* [crackhash](http://crackhash.com/)

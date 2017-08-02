@@ -161,6 +161,27 @@ class PMD5():
         return m[0]
 
 
+class CRACKHASH():
+    ''' http://crackhash.com/ '''
+    name = 'crackhash'
+    url = "http://crackhash.com/"
+    def __init__(self, hashValue):
+        self.hashValue = hashValue
+    
+    def crack(self):
+        post = {'crack':'crack'}
+        post['hash'] = self.hashValue
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:54.0) Gecko/20100101 Firefox/54.0'}
+        response = requests.post(self.url, data=post, headers = headers)
+        response.encoding = response.apparent_encoding
+        html = response.text
+        string = '''==> ([0-9a-f]*)</center><'''
+        pattern = re.compile(string)
+        m = pattern.findall(html)
+        return m[0]
+
+
 def is_success(answer):
     '''
     TO test whether the answer is rigth
@@ -180,7 +201,7 @@ def is_success(answer):
 
 def main():
     # TODO 最后一旦找到直接退出　md5为用户命令行输入的值，并将其全部转换为小写  加上随机数　每次从随机的一个位置开始查询防止被网站ban ip
-    ALLCRACK = [HASHCRACK, HASHTOOLKIT, CMD5, DMD5, PMD5]
+    ALLCRACK = [HASHCRACK, HASHTOOLKIT, CMD5, DMD5, PMD5, CRACKHASH]
     global MD5
     MD5 = '202cb962ac59075b964b07152d234b70'
     random_int = randint(0, len(ALLCRACK))
@@ -197,7 +218,7 @@ def main():
             print(e)
             continue
 
-    print('No Found This Md5!')
+    # print('No Found This Md5!')
 
 if __name__ == '__main__':
     main()
