@@ -121,8 +121,8 @@ class DMD5():
         self.hashValue = hashValue
 
     def crack(self):
-        post = {'_VIEWRESOURSE' : 'c4c92e61011684fc23405bfd5ebc2b31',
-                'result' : 'c1fa08ee052e00e5b8e7527f9211d9c0453bc6f335a6181f2f58c7816f79278e75b690137e34374df3cfcf7dadfe7828dcd0c37a5bc4b493a94730b376b54c80ad8db7d2b168fff553584bff499fd06bd9dd0dbef033481c98020ec237c8c5ed54490cd46b03610d2ea2d1428e0f715ea4a79c07f40416c2de6d657f2eb6ee562d7743db5311a04aa4fa1cb0d034b6868d9abf6ec279'}
+        post = {'_VIEWRESOURSE': 'c4c92e61011684fc23405bfd5ebc2b31',
+                'result': 'c1fa08ee052e00e5b8e7527f9211d9c0453bc6f335a6181f2f58c7816f79278e75b690137e34374df3cfcf7dadfe7828dcd0c37a5bc4b493a94730b376b54c80ad8db7d2b168fff553584bff499fd06bd9dd0dbef033481c98020ec237c8c5ed54490cd46b03610d2ea2d1428e0f715ea4a79c07f40416c2de6d657f2eb6ee562d7743db5311a04aa4fa1cb0d034b6868d9abf6ec279'}
         post['md5'] = self.hashValue
         headers = {
             'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:54.0) Gecko/20100101 Firefox/54.0'}
@@ -130,12 +130,35 @@ class DMD5():
             'http://www.dmd5.com/md5-decrypter.jsp', data=post, headers=headers)
         response.encoding = response.apparent_encoding
         html = response.text
-        with open('log.html','w') as f:
-            f.write(html)
         string = '''解密结果：([0-9a-f]*)</p><p>密文类型：md5</p>'''
         pattern = re.compile(string)
         matcher = pattern.findall(html)
         return matcher[0]
+
+
+class PMD5():
+    ''' http://pmd5.com/#'''
+    name = 'pmd5'
+    url = 'http://pmd5.com/#'
+
+    def __init__(self, hashValue):
+        self.hashValue = hashValue
+
+    def crack(self):
+        post = {'__VIEWSTATE': '/wEPDwUKMTM4NTE3OTkzOQ9kFgJmD2QWAgIFDxYEHgVjbGFzcwULdGlwIHN1Y2Nlc3MeCWlubmVyaHRtbAWhATxpIGNsYXNzPSJpY29uZm9udCI+JiN4ZTY5MTs8L2k+PHAgY2xhc3M9ImluZm8iPuaCqOafpeivoueahOWtl+espuS4suaYr+KAnDxlbT4yMDJjYjk2MmFjNTkwNzViOTY0YjA3MTUyZDIzNGI3MDwvZW0+4oCdLOino+WvhueahOe7k+aenOS4uuKAnDxlbT4xMjM8L2VtPuKAnSE8L3A+ZGQtO6cvbeoJkiaoshSqYE2S5f5PtA==',
+                '__VIEWSTATEGENERATOR': 'CA0B0334',
+                '__EVENTVALIDATION': '/wEWAwK+nKzTAwLigPTXCQKU9f3vAmsrjwD8v1twmEnA1Nr7h4Jic4/O',
+                'jiemi': 'MD5解密'}
+        post['key'] = self.hashValue
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:54.0) Gecko/20100101 Firefox/54.0'}
+        response = requests.post(self.url, data=post, headers=headers)
+        response.encoding = response.apparent_encoding
+        html = response.text
+        string = '''</em>”,解密的结果为“<em>(.*)</em>”!</p></div>'''
+        pattern = re.compile(string)
+        m = pattern.findall(html)
+        return m[0]
 
 
 def is_success(answer):
@@ -157,7 +180,7 @@ def is_success(answer):
 
 def main():
     # TODO 最后一旦找到直接退出　md5为用户命令行输入的值，并将其全部转换为小写  加上随机数　每次从随机的一个位置开始查询防止被网站ban ip
-    ALLCRACK = [HASHCRACK, HASHTOOLKIT, CMD5, DMD5]
+    ALLCRACK = [HASHCRACK, HASHTOOLKIT, CMD5, DMD5, PMD5]
     global MD5
     MD5 = '202cb962ac59075b964b07152d234b70'
     random_int = randint(0, len(ALLCRACK))

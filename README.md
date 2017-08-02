@@ -14,3 +14,5 @@ py3.x
 * [hashtoolkit](http://hashtoolkit.com)
 * [hashcrack](http://hashcrack.com)
 * [cmd5](http://www.cmd5.org)
+* [dmd5](http://www.dmd5.com)
+* [pmd5](http://pmd5.com/#)
