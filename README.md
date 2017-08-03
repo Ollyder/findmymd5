@@ -3,6 +3,7 @@
 # 目的(Destination)
 通过一些免费的MD5查询网站进行MD5的查询
 Through some free MD5 query site for MD5 inquiries
+Automatic decrypt md5 online
 
 # Python版本(version)
 py3.x
