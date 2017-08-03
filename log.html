@@ -1,346 +1,256 @@
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-<meta name="keywords"
-	content="md5解密,md5加密,批量解密MD5,Decrypt md5 hash,decrypt password,md5 password decrypt,crack md5 hash" />
-<meta name="description"
-	content="MD5在线免费解密网站, 支持 16位, 32位, 双重 MD5加密  , SHA1 及  md5(md5($pass).$salt) 类型解密" />
-<meta name="author" content="">
-<link rel="icon" href="favicon.ico">
-
-<title>md5解密 www.dmd5.com</title>
-
-<!-- Bootstrap core CSS -->
-<link href="./css/bootstrap.min.css" rel="stylesheet">
-
-<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-<link href="./css/ie10-viewport-bug-workaround.css" rel="stylesheet">
-
-<!-- Custom styles for this template -->
-<link href="./css/navbar-static-top.css" rel="stylesheet">
-
-<!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
-<!--[if lt IE 9]><script src="././assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-<script src="./js/ie-emulation-modes-warning.js"></script>
-
-<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-<!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
-<script type="text/javascript">
-	function getMD5(src)
-	{
-		var ret = md5(src.value, 0);
-		var encrack = "加密结果:<br> md5(16)=" + ret.substr(8, 16) + "<br><br> md5(32)=" + ret
-				+ "<br><br> sha1(40)=" + hex_sha1(src.value);
-		$('#result').hide();
-		$('#encrypt').show();
-		$('#encrypt_result').html(encrack);
-		if (src.value.length < 32)
-		{
-			$.ajax({
-				url : 'md5Util.jsp?method=learn&text=' + encodeURI(encodeURI(src.value))
-			});
-		}
-	}
-	function getReal(type)
-	{
-		var text = $.trim($('#md5').val());
-		if (text.indexOf(":") > -1)
-		{
-			type = 5;
-		}
-		if (type == 6)
-		{
-			var encrack = "Base64解密结果:" + base64_decode()
-					+ "<br>注:若Base64解密结果为空或者为乱码，那么则基本表示这个不是base64加密，请尝试其他类型";
-			$('#result').hide();
-			$('#encrypt').show();
-			$('#encrypt_result').html(encrack);
-			return;
-		}
-		if (type == 5)
-		{
-			if (!(text.indexOf(":") > -1))
-			{
-				alert('不能识别的密文');
-				return;
-			}
-			var md5 = text.split(":")[0];
-			md5 = md5.replace(/(^\s*)|(\s*$)/g, "");
-			var reg = /^[0-9a-fA-F]{32}$/;
-			reg.ignoreCase = true;
-			if (!reg.test(md5))
-			{
-				alert('不能识别的密文');
-				return;
-			}
-			$('#crackBtn').attr('disabled', 'disabled');
-			$.ajax({
-				url : 'md5Util.jsp?method=crack&type=' + type + '&md5=' + text,
-				type : 'post',
-				success : function(data)
-				{
-					$("#_VIEWRESOURSE").val("c4c92e61011684fc23405bfd5ebc2b31");
-					$("#callmd5").val(text);
-					$("#callresult").val(encodeURIComponent((data.trim())));
-					$('#_CALLFORM').submit();
-				}
-			});
-		}
-		else
-		{
-			if (text.length == 40)
-			{
-				type = 4;
-			}
-			if (text.length > 32 && type != 4 && !(text.indexOf(":") > -1))
-			{
-				text = text.substr(0, 32);
-			}
-			text = text.replace(/(^\s*)|(\s*$)/g, "");
-			var reg = /^[0-9a-fA-F]{16}$|^[0-9a-fA-F]{20}$|^[0-9a-fA-F]{32}$|^[0-9a-fA-F]{40}$/;
-			reg.ignoreCase = true;
-			if (!reg.test(text.toLowerCase()) && !checkBase64(text))
-			{
-				alert('请输入正确的MD5字符串');
-				return;
-			}
-			else
-			{
-				$('#crackBtn').attr('disabled', 'disabled');
-				$.ajax({
-					url : 'md5Util.jsp?method=crack&type=' + type + '&md5=' + text,
-					type : 'post',
-					success : function(data)
-					{
-						$("#_VIEWRESOURSE").val("c4c92e61011684fc23405bfd5ebc2b31");
-						$("#callmd5").val(text);
-						$("#callresult").val(encodeURIComponent((data.trim())));
-						$('#_CALLFORM').submit();
-					}
-				});
-			}
-		}
-	}
-	function research(md5text)
-	{
-		$('#md5').val(md5text);
-		getReal(1);
-	}
-	function checkBase64(str)
-	{
-		if (str.length == 24 && str.substring(str.length - 2, str.length) == "==")
-		{
-			return true;
-		}
-		return false;
-	}
-	function base64_decode()
-	{
-		var words = $.trim($('#md5').val());
-		return decode64gb2312(words);
-	}
+<!doctype html><head>
+    <title>Reverse Hash Calculator - SANS Internet Storm Center </title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta property="og:site_name" content="SANS Internet Storm Center" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="twitter:site" content="@sans_isc" />
+    <meta property="twitter:creator" content="@sans_isc" />
+    <meta property="twitter:card" content="summary" />
+    <meta property="twitter:image" content="https://isc.sans.edu/images/logos/isc/large.png" />
+    <meta property="twitter:image:alt" content="SANS Internet Storm Center" />
+    <meta property="og:image" content="https://isc.sans.edu/images/logos/isc/large.png" />
+    <meta name="DESCRIPTION" content="SANS Internet Storm Center - A global cooperative cyber threat / internet security monitor and alert system. Featuring daily handler diaries with summarizing and analyzing new threats to networks and internet security events."/>
+    <meta name="AUTHOR" content="SANS Internet Storm Center"/>
+    <meta name="KEYWORDS" content="isc, sans, internet, security, threat, worm, virus, phishing, hacking, vulnerability"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" href="/iscfavicon.ico" />
+    <link rel="canonical" href="https://isc.sans.edu/tools/reversehash.html" />
+    <link type="text/css" rel="stylesheet" href="/css/screen.css" />
+<script language="javascript" type="text/javascript" src="/3p/jQuery/jquery.js"></script>
+<script src="/3p/jquery-eu-cookie-law-popup/js/jquery-eu-cookie-law-popup.js"></script>
+<link rel="stylesheet" type="text/css" href="/3p/jquery-eu-cookie-law-popup/css/jquery-eu-cookie-law-popup.css"/>
+<script type="application/ld+json">
+{
+	"@context": "http://schema.org",
+	"@type": "Organization",
+	"name": "SANS Internet Storm Center",
+	"url":   "https://isc.sans.edu/",
+	"logo": "https://isc.sans.edu/images/logos/isc/large.png",
+	"email": "handlers@isc.sans.edu",
+	"address": {
+		   "streetAddress": "8120 Woodmont Avenue, Suite 310",
+		   "addressLocality": "Bethesda",
+		   "addressRegion": "Maryland",
+		   "addressCountry": "USA",
+		   "postalCode": "20814"
+        },
+ 	"sameAs": [
+	          "https://twitter.com/sans_isc"
+		  ]
+}
 </script>
-</head>
 
-<body style='min-height: 950px'>
-	
-	<form action="md5-decrypter.jsp" method="post" id="_CALLFORM">
-		<input type="hidden" id="_VIEWRESOURSE" name="_VIEWRESOURSE" /> <input
-			type="hidden" id="callmd5" name="md5" /> <input type="hidden"
-			id="callresult" name="result" />
+<!-- this is not the comment you are looking for d8a16192e28c59 -->
+</head><body class="isc">
+<div id="container">
+  <div id="topWrapper">
+    <div class="g">
+      <span class="threatLevel">
+        Threat Level: <a href="/infocon.html">green</a>
+      </span>
+      <span class="currentHandler">
+        Handler on Duty: <a title="Bojan Zdrnja" href="/handler_list.html#bojan-zdrnja">Bojan Zdrnja</a>
+      </span>
+    </div>
+
+  </div>
+<div class="eupopup eupopup-top"></div>
+	<h1>
+    <a href="/">SANS ISC: Reverse Hash Calculator - SANS Internet Storm Center  <span></span></a>
+    <ul class="site-selector">
+      <li class="site-switcher"><a href="#"><span class="hidden">SANS Site Network</span></a>
+        <ul class="sites">
+          <li class="current-site">Current Site</li>
+          <li class="isc"><a href="https://isc.sans.edu">
+            <span></span>
+            Internet Storm Center
+          </a></li>
+          <li class="selector-help">Other SANS Sites
+            <a href="https://www.sans.org/help/site-network"><span class="hidden">Help</span></a>
+          </li>
+          <li class="sti"><a href="http://www.sans.edu">
+            <span></span>
+            Graduate Degree Programs
+          </a></li>
+          <li class="sans"><a href="http://www.sans.org">
+            <span></span>
+            Security Training
+          </a></li>
+          <li class="giac"><a href="http://www.giac.org">
+            <span></span>
+            Security Certification
+          </a></li>
+          <li class="awareness"><a href="http://www.securingthehuman.org">
+            <span></span>
+            Security Awareness Training
+          </a></li>
+          <li class="pentest"><a href="http://pen-testing.sans.org">
+            <span></span>
+            Penetration Testing
+          </a></li>
+          <li class="ics"><a href="http://ics.sans.org">
+            <span></span>
+            Industrial Control Systems
+          </a></li>
+          <li class="cyber-defense"><a href="http://cyber-defense.sans.org">
+            <span></span>
+            Cyber Defense Foundations
+          </a></li>
+          <li class="forensics"><a href="http://computer-forensics.sans.org">
+            <span></span>
+            Computer Forensics
+          </a></li>
+          <li class="ssi"><a href="http://software-security.sans.org">
+            <span></span>
+            Software Security
+          </a></li>
+          <li class="sic"><a href="http://sic.sans.org">
+            <span></span>
+            Government OnSite Training
+          </a></li>
+        </ul>
+      </li>
+    </ul><span id="pagetitle">
+    Reverse Hash Calculator
+	</span></h1>
+	<form id="headerSearch" name="searchform" action="/search.html" method="post">
+        <input type="text" name="q" placeholder="Keyword, Domain, Port, IP or Header" />
+        <input type="submit" value="Search" /><input type="hidden" name="token" value="3684d55005d66d58080a5001bc5257e05ae2baf2" />
 	</form>
-	<!-- Static navbar -->
-	<nav class="navbar navbar-default navbar-static-top">
-		<div class="container">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed"
-					data-toggle="collapse" data-target="#navbar" aria-expanded="false"
-					aria-controls="navbar">
-					<span class="sr-only">Toggle navigation</span> <span
-						class="icon-bar"></span> <span class="icon-bar"></span> <span
-						class="icon-bar"></span>
-				</button>
-				<a class="navbar-brand" href="http://www.dmd5.com">www.dmd5.com</a>
-			</div>
-			<div id="navbar" class="navbar-collapse collapse">
-				<ul class="nav navbar-nav">
-					<li class="active"><a href="http://www.dmd5.com">首页</a></li>
-					<li><a href="batch-decrypter.jsp">在线批量解密</a></li>
-					<li><a href="#contact">上传文件解密</a></li>
-					<li><a href="#contact">明文提交</a></li>
-					<li class="dropdown"><a href="#" class="dropdown-toggle"
-						data-toggle="dropdown" role="button" aria-haspopup="true"
-						aria-expanded="false">辅助工具<span class="caret"></span></a>
-						<ul class="dropdown-menu">
-							<li><a href="#">工具1</a></li>
-							<li><a href="#">工具2</a></li>
-							<li><a href="#">工具3</a></li>
-						</ul></li>
-					<li><a href="#help">帮助</a></li>
-				</ul>
-				<ul class="nav navbar-nav navbar-right" id='unloginul'
-					style='display:'>
-					<li><a href="login.jsp">登录</a></li>
-					<li><a href="register.jsp">注册</a></li>
-				</ul>
-				<ul class="nav navbar-nav navbar-right" id='loginul'
-					style='display:none'>
-					<li><a href="#">null</a></li>
-					<li><a href="#">剩余积分：0</a></li>
-				</ul>
-			</div>
-			<!--/.nav-collapse -->
-		</div>
-	</nav>
-
-
-	<div class="container">
-		<!-- Main component for a primary marketing message or call to action -->
-		<div class="jumbotron" style='background-color: #fff'>
-			<h2 align="center">
-				MD5解密 <font color="grey"> www.dmd5.com </font>
-			</h2>
-
-			<div class="alert alert-info"
-				style='width: 75%; margin: 0 auto; margin-top: 30px' role="alert">
-<!-- 				<div style="float: right; margin-left: 20px"> -->
-<!-- 					<img src="images/subuy.jpg"> -->
-<!-- 					<p style="font-size: 12px;"> -->
-<!-- 						<font color="red">广告</font>：SUBUY扫呗，自己的移动端快速收款平台，<br> -->
-<!-- 						使用微信支付宝选择信用卡扫码直接刷(<font color="red">nidongde</font>)<br> -->
-<!-- 						<font color="red">推荐有礼 </font><a target="_blank" href='subuyinfo.txt'><strong style="color: red;">点击查看使用说明</strong></a> -->
-<!-- 					</p> -->
-<!-- 				</div> -->
-				<ul id="marquee" class="marquee">
-					<!--<li>热烈庆祝www.dmd5.com 新版正式上线</li>-->
-					<li><font color="red" style="font-weight: bold;">本站所有功能及数据仅可用于密码学研究及信息安全评估,严禁用于任何非法用途,如有违反本站不承担任何责任;</font></li>
-					<li>本站提供base64,16位、20位、32位MD5,base64(md5), 双重 MD5加密 , SHA1 及
-						md5(md5($pass).$salt) 类型解密,后续不断添加其他类型</li>
-					<li>原pdtools.net 所有解密功能全部搬迁至本站,pdtools.net不再提供解密功能</li>
-					<li><font color="red">已开启邮件提醒功能，后台破解成功后将在第一时间邮件通知，注册登录后即可使用！</font></li>
-					<li>QQ讨论群已与2017年7月8日关闭，谢谢各位曾经的支持！</li>
-				</ul>
-			</div>
-			<div class="col-lg-6"
-				style="margin: 0 auto; float: none; width: 78%; margin-top: 20px">
-				<div class="input-group">
-					<input type="text" class="form-control" id='md5'
-						value='202cb962ac59075b964b07152d234b70' placeholder="请输入待解密文" onkeyup="getMD5(this)">
-					<div class="input-group-btn">
-						<button id='crackBtn' class="btn btn-info dropdown-toggle"
-							data-toggle="dropdown">
-							解密！ <span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu pull-right">
-							<li><a href="#" onclick="getReal(1)">md5</a></li>
-							<li><a href="#" onclick="getReal(2)">md5(md5($pass))</a></li>
-							<li><a href="#" onclick="getReal(5)">md5(md5($pass).$salt)</a></li>
-							<li><a href="#" onclick="getReal(4)">SHA1</a></li>
-							<li><a href="#" onclick="getReal(4)">MySQL4.1/MySQL5+</a></li>
-							<li><a href="#" onclick="getReal(6)">Base64</a></li>
-							<!--                      <li class="divider"></li> -->
-							<!--                      <li><a href="#">分离的链接</a></li> -->
-						</ul>
-					</div>
-					<!-- /btn-group -->
-				</div>
-				<!-- /input-group -->
-			</div>
-			<!-- /.col-lg-6 -->
-		</div>
-		<div id="result" class="col-md-5 col-md-offset-4"
-			style='margin: 0 auto;width:92% ;float: none;display: '>
-			<div class="alert alert-info"
-				style='width: 75%; margin: 0 auto; margin-top: -60px' role="alert">
-				<p>解密成功！</p><p>密文：202cb962ac59075b964b07152d234b70</p><p>解密结果：123</p><p>密文类型：md5</p><p>解密用时：14毫秒</p>
-			</div>
-		</div>
-		<div id="encrypt" class="col-md-5 col-md-offset-4"
-			style='margin: 0 auto; width: 92%; float: none; display: none'>
-			<div class="alert alert-info" id='encrypt_result'
-				style='width: 75%; margin: 0 auto; margin-top: -60px' role="alert">
-
-			</div>
-		</div>
-		<div class="col-md-5 col-md-offset-4"
-			style='margin: 0 auto; width: 70%;height:370px; float: none; margin-top: 10px'>
-			
-		</div>
+    <form id="headerLogin" method="post" action="/login.html" name="loginform">
+        <input type="hidden" name="token" value="3684d55005d66d58080a5001bc5257e05ae2baf2" />
+        <input type="text" name="email" placeholder="Email" />
+        <input type="password" name="pw" autocomplete="off" placeholder="Password" />
+        <input type="submit" value="Log In" /><br />
+        <a href="/register.html">Sign Up for Free!</a> &nbsp; <a href="/resetpassword.html">Forgot Password?</a>
+	</form>
+	<div id="smallHeaderLogin">
+	    <a href="/login.html">Log In</a> or <a href="/register.html">Sign Up for Free</a>!
 	</div>
-	<!-- /container -->
-	<hr>
-	<footer style='height: 30px'>
-		<p align="center">
-			<a title="联系邮箱" href="/cdn-cgi/l/email-protection#487c787b7971787c7b78083939662b2725"><span class="__cf_email__" data-cfemail="182c282b2921282c2b28586969367b7775">[email&#160;protected]</span><script data-cfhash='f9e31' type="text/javascript">/* <![CDATA[ */!function(t,e,r,n,c,a,p){try{t=document.currentScript||function(){for(t=document.getElementsByTagName('script'),e=t.length;e--;)if(t[e].getAttribute('data-cfhash'))return t[e]}();if(t&&(c=t.previousSibling)){p=t.parentNode;if(a=c.getAttribute('data-cfemail')){for(e='',r='0x'+a.substr(0,2)|0,n=2;a.length-n;n+=2)e+='%'+('0'+('0x'+a.substr(n,2)^r).toString(16)).slice(-2);p.replaceChild(document.createTextNode(decodeURIComponent(e)),c)}p.removeChild(t)}}catch(u){}}()/* ]]> */</script></a> |
-			Copyright &copy;2016, DMD5.COM, All Rights Reserved 备案号:<a
-				href='http://www.miitbeian.gov.cn'>苏ICP备15021974号-2</a>
-			<script type="text/javascript">
-				var cnzz_protocol = (("https:" == document.location.protocol) ? " https://"
-						: " http://");
-				document
-						.write(unescape("%3Cspan id='cnzz_stat_icon_1256738039'%3E%3C/span%3E%3Cscript src='"
-								+ cnzz_protocol
-								+ "s4.cnzz.com/z_stat.php%3Fid%3D1256738039%26show%3Dpic' type='text/javascript'%3E%3C/script%3E"));
-			</script>
-			</br>
-		</p>
-	</footer>
+	<div id="content">
+		<div class="wrapper">               <a href="/tools/">Back to Tools</a> | <a href="#background">Background</a> | <a href="#search">Search Form</a> | <a href="#last20">Last 20 Hashes</a>
+             <a name="background"></a>
+             <h4>Background</h4>
+             <blockquote>
+              <p>This page doesn't use rainbow tables (yet), but a similar, simpler approach. It uses a database of a couple million pre-compiled hash values. The strings used come from various password databases, and should have a pretty good chance of &quot;hitting&quot; your value. There is an intentional delay in the response to limit the load on our database.</p>
+              <p><i>Please be patient</i>.</p>
+             </blockquote>
 
-	<!-- Bootstrap core JavaScript
-    ================================================== -->
-	<!-- Placed at the end of the document so the pages load faster -->
-	<script src="https://cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
-	<script type="text/javascript" src="./js/md5/md5.js"></script>
-	<script type="text/javascript" src="./js/md5/sha1.js"></script>
-	<script src="./js/gb2312.js" type="text/javascript"></script>
-	<script>
-		window.jQuery || document.write('<script src="./jquery-easyui/jquery.min.js"><\/script>')
-	</script>
-	<script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
-	<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-	<script src="./js/ie10-viewport-bug-workaround.js"></script>
-	<script>
-		var _hmt = _hmt || [];
-		(function()
-		{
-			var hm = document.createElement("script");
-			hm.src = "//hm.baidu.com/hm.js?92844f8dc52e2e56770c058f21518d54";
-			var s = document.getElementsByTagName("script")[0];
-			s.parentNode.insertBefore(hm, s);
-		})();
-	</script>
+             <a name="search"></a>
+             <h4>Search Form</h4>
+             <blockquote>
+             <p><strong>NOTE:</strong> <em>This page is limited to <strong>20</strong> queries per one(1) hour time period.</em></p>                                <p style="border: 1px solid; padding:6px;">
+                   md5 hash 202cb962ac59075b964b07152d234b70 = 123                 </p><br />
+               
+               <form method="POST" action="/tools/reversehash.html" ><input type="hidden" name="token" value="3684d55005d66d58080a5001bc5257e05ae2baf2" />               Enter a md5 or sha1 hash:<br />
+               <input class="formfield" type="text" name="text" value="202cb962ac59075b964b07152d234b70" size="40" maxsize="255" >
 
-<script>/* <![CDATA[ */(function(d,s,a,i,j,r,l,m,t){try{l=d.getElementsByTagName('a');t=d.createElement('textarea');for(i=0;l.length-i;i++){try{a=l[i].href;s=a.indexOf('/cdn-cgi/l/email-protection');m=a.length;if(a&&s>-1&&m>28){j=28+s;s='';if(j<m){r='0x'+a.substr(j,2)|0;for(j+=2;j<m&&a.charAt(j)!='X';j+=2)s+='%'+('0'+('0x'+a.substr(j,2)^r).toString(16)).slice(-2);j++;s=decodeURIComponent(s)+a.substr(j,m-j)}t.innerHTML=s.replace(/</g,'&lt;').replace(/\>/g,'&gt;');l[i].href='mailto:'+t.value}}catch(e){}}}catch(e){}})(document);/* ]]> */</script></body>
-</html>
+               <p>Current "Hit Rate":
+               100 %
+               <br />
+               Size of database:
+               20,621,101 words
 
+             </blockquote>
+
+             <a name="last20"></a>
+             <h4>Last 20 Hashes Solved</h4>
+             <blockquote>
+              <table class="datatable">
+               <thead>
+                <tr><th>Hash</th></tr>
+               </thead>
+               <tbody>
+                <tr><td><code>202cb962ac59075b964b07152d234b70</code></td></tr><tr><td><code>0e3a0c8c3a571a855c958813d9b851a1</code></td></tr><tr><td><code>5ebe2294ecd0e0f08eab7690d2a6ee69</code></td></tr><tr><td><code>5ebe2294ecd0e0f08eab7690d2a6ee69</code></td></tr><tr><td><code>200CEB26807D6BF99FD6F4F0D1CA54D4</code></td></tr><tr><td><code>EDAA38E6360BD663060FABB8AD619EA5</code></td></tr><tr><td><code>e821ba1edb9dc0a445b61d8ce702052a</code></td></tr><tr><td><code>f55f660580572baeb0b0b28d6f920d56e2081892</code></td></tr><tr><td><code>f55f660580572baeb0b0b28d6f920d56e2081892</code></td></tr><tr><td><code>64024C4AFAAC000B12DDCD2E0C51512B</code></td></tr><tr><td><code>cbfdac6008f9cab4083784cbd1874f76618d2a97</code></td></tr><tr><td><code>c129b324aee662b04eccf68babba85851346dff9</code></td></tr><tr><td><code>c129b324aee662b04eccf68babba85851346dff9</code></td></tr><tr><td><code>e6078b9b1aac915d11b9fd59791030bf</code></td></tr><tr><td><code>17045e8ee9b86d5df05ff70f8b099af534febda6</code></td></tr><tr><td><code>3f92e0df04ea9e1c98b959e465569dd5</code></td></tr><tr><td><code>1c1707e8a20719056bfc9a232527c5bd</code></td></tr><tr><td><code>47c6b15aca93873f58522f26300d181d</code></td></tr><tr><td><code>4658f151aa7c96dc0171420a64103bd9</code></td></tr><tr><td><code>23bc01b1af18afd23cbec8287d4980c3</code></td></tr>               </tbody>
+              </table>
+             </blockquote>
+
+        </div>
+    </div>
+    <div id="navigation">
+        <ul>
+            <li><a href="/contact.html">Contact Us</a>
+                <ul>
+		    <li class="first"><a href="/contact.html">Contact Us</a></li>
+                    <li><a href="/about.html">About Us</a></li>
+                    <li><a href="/handler_list.html">Handlers</a></li>
+                </ul>
+            </li>
+            <li><a href="/diaryarchive.html">Diary</a></li>
+            <li><a href="/podcast.html">Podcasts</a></li>
+            <li><a href="/jobs">Jobs</a></li>
+            <li><a href="/newssummary.html">News</a></li>
+            <li class="active"><a href="/tools/">Tools</a>
+                <ul>
+                    <li class="first"><a href="/howto.html">DShield Sensor</a></li>
+                    <li><a href="/404project/">404Project</a></li>
+                    <li><a href="/glossary.html">InfoSec Glossary</a></li>
+                    <li><a href="/webhoneypot/index.html">Webhoneypot</a></li>
+                    <li><a href="/fightback.html">Fightback</a></li>
+                </ul>
+            </li>
+            <li><a href="/reports.html">Data</a>
+                <ul>
+                    <li><a href="/404project">404 Project</a></li>
+                    <li><a href="/httpheaders/">HTTP Header Activity</a></li>
+                    <li><a href="/port.html">TCP/UDP Port Activity</a></li>
+                    <li><a href="/trends.html">Port Trends</a></li>
+                    <li><a href="/presentations/">Presentations &amp; Papers</a></li>
+                    <li><a href="/ssh.html">SSH Scanning Activity</a></li>
+                    <li><a href="/crls.html">SSL CRL Activity</a></li>
+                    <li><a href="/suspicious_domains.html">Suspicious Domains</a></li>
+                    <li><a href="/threatfeed.html">Threat Feeds Activity</a></li>
+                    <li><a href="/threatmap.html">Threat Feeds Map</a></li>
+                    <li><a href="/links.html">Useful InfoSec Links</a></li>
+                    <li><a href="/poll.html">InfoSec Poll Results</a></li>
+                </ul>
+            </li>
+            <li><a href="/forums/">Forums</a>
+                <ul>
+                    <li><a href="/forums/Auditing/">Auditing</a></li>
+                    <li><a href="/forums/Diary+Discussions/">Diary Discussions</a></li>
+                    <li><a href="/forums/Forensics/">Forensics</a></li>
+                    <li><a href="/forums/General+Discussion/">General Discussions</a></li>
+                    <li><a href="/forums/Industry+News/">Industry News</a></li>
+                    <li><a href="/forums/Network+Security/">Network Security</a></li>
+                    <li><a href="/forums/Penetration+Testing/">Penetration Testing</a></li>
+                    <li><a href="/forums/Software+Security/">Software Security</a></li>
+                </ul>
+            </li>
+        </ul>
+<hr>
+<div class="questionssidebar">
+<b>Questions? Feedback?</b><br/>
+Use our <a href="/contact.html">contact form</a> or<br/>
+<a href="https://github.com/jullrich/ISC-Bugs/issues">report bugs here</a><br/>
+For interactive help and to chat with other users, try our 
+<a href="https://join.slack.com/dshieldusers/shared_invite/MjAxNDkwNDQ5NTU0LTE0OTgwNzI2MzQtMzdiNmRkZTI2YQ">
+Slack</a> group.<br/>
+<a href="https://join.slack.com/dshieldusers/shared_invite/MjAxNDkwNDQ5NTU0LTE0OTgwNzI2MzQtMzdiNmRkZTI2YQ"><img src="/images/slack.png" width="100px"></a><br/>
+</div>
+    </div>
+    <div id="sidebar">
+        <p>Learn <a href="/about.html">about the Internet Storm Center</a> and our <a href="/handler_list.html">volunteer InfoSec handlers</a></p>
+        <iframe width="160" height="600" src="https://www.sans.org/banners/isc_ss.php" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe>
+	</div>
+</div>
+<div id="footer">
+	<ul id="socialIconsFoot">
+        <li><a href="https://www.youtube.com/channel/UCfbOsqPmWg1H_34hTjKEW2A">YouTube<span></span></a></li>
+        <li class="twitter"><a href="http://twitter.com/sans_isc">Twitter<span></span></a></li>
+        <li class="linkedin"><a href="http://www.linkedin.com/groups?gid=35470">LinkedIn<span></span></a></li>
+        <li class="rss"><a href="/xml.html">ISC Feed<span></span></a></li>
+	</ul>
+	<a class="sans" href="https://www.sans.edu/"><span></span></a>
+	<ul id="footLinks">
+        <li><a href="http://www.cafepress.com/stormcenter">Shop</a></li>
+        <li><a href="/linkback.html">Link To Us</a></li>
+        <li><a href="/about.html">About Us</a></li>
+        <li><a href="/handler_list.html">Handlers</a></li>
+        <li><a href="/privacy.html">Privacy Policy</a></li>
+        <li><a href="#top">Back To Top</a></li>
+	</ul>
+	<strong>Developers:</strong> We have an <a href="/api/">API</a> for you! &nbsp; <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Creative Commons License" src="/images/cc.png" /></a>
+</div>
+</body></html>

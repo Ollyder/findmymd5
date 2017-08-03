@@ -17,3 +17,4 @@ py3.x
 * [dmd5](http://www.dmd5.com)
 * [pmd5](http://pmd5.com/#)
 * [crackhash](http://crackhash.com/)
+* [iscsans](https://isc.sans.edu/tools/reversehash.html)

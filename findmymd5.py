@@ -37,7 +37,7 @@ class HASHCRACK():
                 'string': None,
                 'Submit': 'Submit'}
         url = 'http://hashcrack.com/index.php'
-        resonse = requests.post(url, data=post, timeout=3)
+        resonse = requests.post(url, data=post, timeout=2)
         html = resonse.text
         soup = BeautifulSoup(html, 'lxml')
         # <span class=hervorheb2>123</span></div></TD>
@@ -59,7 +59,7 @@ class HASHTOOLKIT():
 
     def crack(self):
         get_url = self.url + r'/reverse-hash/?hash=' + self.hashValue
-        response = requests.get(get_url, timeout=3)
+        response = requests.get(get_url, timeout=2)
         html = response.text
         s = BeautifulSoup(html, 'lxml')
         t = s.find('span', attrs={'title': "decrypted md5 hash"})
@@ -76,7 +76,7 @@ class CMD5():
 
     def crack(self):
         s = requests.session()
-        s.get('http://www.cmd5.org')
+        s.get('http://www.cmd5.org', timeout=2)
 
         post = {'__EVENTTARGET': 'Button1',
                 '__EVENTARGUMENT': '',
@@ -97,13 +97,12 @@ class CMD5():
             'Content-Type': 'application/x-www-form-urlencoded',
             'Content-Length': '1942',
             'Referer': 'http://www.cmd5.com/',
-            'Cookie': 'ASP.NET_SessionId=eur50sa5zfbom53gff4i4ed1; comefrom=https://www.baidu.com/link?url=6sjybewmhlwquvfs2iqzvkrsuvw2dp-xgekrasr1luq&wd=&eqid=910a0fef00004180000000035980769b; FirstVisit=2017/8/1 14:41:08; Hm_lvt_0b7ba6c81309fff7ce4498ec7b107c0b=1501591271,1501592417; Hm_lpvt_0b7ba6c81309fff7ce4498ec7b107c0b=1501592417',
             'Connection': 'keep-alive',
             'Upgrade-Insecure-Requests': '1',
             'Pragma': 'no-cache',
             'Cache-Control': 'no-cache'}
 
-        response = s.post('http://www.cmd5.com/', data=post, headers=hearders)
+        response = s.post('http://www.cmd5.com/', data=post, headers=hearders, timeout=2)
         response.encoding = response.apparent_encoding
         strings = '''<span id="ctl00_ContentPlaceHolder1_LabelAnswer">(.*)<br /><br /><a target'''
         pattern = re.compile(strings)
@@ -127,7 +126,7 @@ class DMD5():
         headers = {
             'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:54.0) Gecko/20100101 Firefox/54.0'}
         response = requests.post(
-            'http://www.dmd5.com/md5-decrypter.jsp', data=post, headers=headers)
+            'http://www.dmd5.com/md5-decrypter.jsp', data=post, headers=headers, timeout=2)
         response.encoding = response.apparent_encoding
         html = response.text
         string = '''解密结果：([0-9a-f]*)</p><p>密文类型：md5</p>'''
@@ -152,7 +151,7 @@ class PMD5():
         post['key'] = self.hashValue
         headers = {
             'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:54.0) Gecko/20100101 Firefox/54.0'}
-        response = requests.post(self.url, data=post, headers=headers)
+        response = requests.post(self.url, data=post, headers=headers, timeout=2)
         response.encoding = response.apparent_encoding
         html = response.text
         string = '''</em>”,解密的结果为“<em>(.*)</em>”!</p></div>'''
@@ -165,21 +164,54 @@ class CRACKHASH():
     ''' http://crackhash.com/ '''
     name = 'crackhash'
     url = "http://crackhash.com/"
+
     def __init__(self, hashValue):
         self.hashValue = hashValue
-    
+
     def crack(self):
-        post = {'crack':'crack'}
+        post = {'crack': 'crack'}
         post['hash'] = self.hashValue
         headers = {
             'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:54.0) Gecko/20100101 Firefox/54.0'}
-        response = requests.post(self.url, data=post, headers = headers)
+        response = requests.post(self.url, data=post, headers=headers, timeout=2)
         response.encoding = response.apparent_encoding
         html = response.text
         string = '''==> ([0-9a-f]*)</center><'''
         pattern = re.compile(string)
         m = pattern.findall(html)
         return m[0]
+
+
+class ISCSANS():
+    ''' https://isc.sans.edu/tools/reversehash.html
+    该网站容易超时
+    '''
+    name = 'isc_sans_edu'
+    url = 'https://isc.sans.edu/tools/reversehash.html'
+
+    def __init__(self, hashValue):
+        self.hashValue = hashValue
+
+    def crack(self):
+        '''
+        Cookie 与　token 照应
+        '''
+        s = requests.session()
+        s.headers['User-Agent'] = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:54.0) Gecko/20100101 Firefox/54.0'
+        # 给seesion设置Cookie和得到与之对应的token
+        q = s.get(self.url, timeout=3)
+        html = q.text
+        string = '<input type="submit" value="Search" /><input type="hidden" name="token" value="(.*)" />'
+        pattern = re.compile(string)
+        m = pattern.findall(html)
+        post = {'text': '202cb962ac59075b964b07152d234b70'}
+        post['token'] = m[0].strip()
+        p = s.post(url=self.url, data=post, timeout=3)
+        html = p.text
+        string = 'md5 hash '+self.hashValue+' =(.*)</p><br />'
+        pattern = re.compile(string)
+        m = pattern.findall(html)
+        return m[0].strip()
 
 
 def is_success(answer):
@@ -198,10 +230,17 @@ def is_success(answer):
     if(m != MD5):
         raise Exception
 
+def do_Cookie_HTTP(session):
+    ''' 
+        Args: 
+            session:requests.session()
+        Returns:
+            cookies
+    `       '''
 
 def main():
     # TODO 最后一旦找到直接退出　md5为用户命令行输入的值，并将其全部转换为小写  加上随机数　每次从随机的一个位置开始查询防止被网站ban ip
-    ALLCRACK = [HASHCRACK, HASHTOOLKIT, CMD5, DMD5, PMD5, CRACKHASH]
+    ALLCRACK = [HASHCRACK, HASHTOOLKIT, CMD5, DMD5, PMD5, CRACKHASH, ISCSANS]
     global MD5
     MD5 = '202cb962ac59075b964b07152d234b70'
     random_int = randint(0, len(ALLCRACK))
