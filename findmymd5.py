@@ -6,6 +6,7 @@ try:
     import re
     import hashlib
     from random import randint
+    import sys
 except ImportError as e:
     print("缺少必要库")
 
@@ -76,15 +77,16 @@ class CMD5():
 
     def crack(self):
         s = requests.session()
-        s.headers['User-Agent'] = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:54.0) Gecko/20100101 Firefox/54.0'
-        p = s.get('http://www.cmd5.org')
+        s.headers[
+            'User-Agent'] = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:54.0) Gecko/20100101 Firefox/54.0'
+        p = s.get('http://www.cmd5.org', timeout=2)
         p.encoding = p.apparent_encoding
         post = {'__EVENTTARGET': 'Button1',
-                    '__EVENTARGUMENT': '',
-                    '__VIEWSTATEGENERATOR': 'CA0B0334',
-                    'ctl00$ContentPlaceHolder1$InputHashType': 'md5(md5($pass))',
-                    'ctl00$ContentPlaceHolder1$Button1': '查询',
-                    'ctl00$ContentPlaceHolder1$HiddenField1': ''}
+                '__EVENTARGUMENT': '',
+                '__VIEWSTATEGENERATOR': 'CA0B0334',
+                'ctl00$ContentPlaceHolder1$InputHashType': 'md5(md5($pass))',
+                'ctl00$ContentPlaceHolder1$Button1': '查询',
+                'ctl00$ContentPlaceHolder1$HiddenField1': ''}
         post['ctl00$ContentPlaceHolder1$TextBoxInput'] = self.hashValue
         html = p.text
         string = 'name="__VIEWSTATE" id="__VIEWSTATE" value="(.*)" />'
@@ -109,15 +111,14 @@ class CMD5():
         m = re.compile(string).findall(html)
         post['ctl00$ContentPlaceHolder1$HiddenField'] = m[0]
         # 若没有headers 则没有返回的数据
-        s.headers['Content-Type'] =  'application/x-www-form-urlencoded'
+        s.headers['Content-Type'] = 'application/x-www-form-urlencoded'
         s.headers['Referer'] = 'http://www.cmd5.com/'
-        response = s.post('http://www.cmd5.com/', data=post)
+        response = s.post('http://www.cmd5.com/', data=post, timeout=2)
         response.encoding = response.apparent_encoding
         strings = '''<span id="ctl00_ContentPlaceHolder1_LabelAnswer">(.*)<br /><br /><a target'''
         pattern = re.compile(strings)
         m = pattern.findall(response.text)
         return m[0]
-
 
 
 class DMD5():
@@ -161,7 +162,8 @@ class PMD5():
         post['key'] = self.hashValue
         headers = {
             'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:54.0) Gecko/20100101 Firefox/54.0'}
-        response = requests.post(self.url, data=post, headers=headers, timeout=2)
+        response = requests.post(
+            self.url, data=post, headers=headers, timeout=2)
         response.encoding = response.apparent_encoding
         html = response.text
         string = '''</em>”,解密的结果为“<em>(.*)</em>”!</p></div>'''
@@ -183,7 +185,8 @@ class CRACKHASH():
         post['hash'] = self.hashValue
         headers = {
             'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:54.0) Gecko/20100101 Firefox/54.0'}
-        response = requests.post(self.url, data=post, headers=headers, timeout=2)
+        response = requests.post(
+            self.url, data=post, headers=headers, timeout=2)
         response.encoding = response.apparent_encoding
         html = response.text
         string = '''==> ([0-9a-f]*)</center><'''
@@ -207,7 +210,8 @@ class ISCSANS():
         Cookie 与　token 照应
         '''
         s = requests.session()
-        s.headers['User-Agent'] = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:54.0) Gecko/20100101 Firefox/54.0'
+        s.headers[
+            'User-Agent'] = 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:54.0) Gecko/20100101 Firefox/54.0'
         # 给seesion设置Cookie和得到与之对应的token
         q = s.get(self.url, timeout=3)
         html = q.text
@@ -218,7 +222,7 @@ class ISCSANS():
         post['token'] = m[0].strip()
         p = s.post(url=self.url, data=post, timeout=3)
         html = p.text
-        string = 'md5 hash '+self.hashValue+' =(.*)</p><br />'
+        string = 'md5 hash ' + self.hashValue + ' =(.*)</p><br />'
         pattern = re.compile(string)
         m = pattern.findall(html)
         return m[0].strip()
@@ -240,19 +244,15 @@ def is_success(answer):
     if(m != MD5):
         raise Exception
 
-def do_Cookie_HTTP(session):
-    ''' 
-        Args: 
-            session:requests.session()
-        Returns:
-            cookies
-    `       '''
 
 def main():
     # TODO 最后一旦找到直接退出　md5为用户命令行输入的值，并将其全部转换为小写  加上随机数　每次从随机的一个位置开始查询防止被网站ban ip
+    if(len(sys.argv) != 2):
+        print('''\tUsage:python findmymd5.py md5Hash''')
+        exit(0)
     ALLCRACK = [HASHCRACK, HASHTOOLKIT, CMD5, DMD5, PMD5, CRACKHASH, ISCSANS]
     global MD5
-    MD5 = '202cb962ac59075b964b07152d234b70'
+    MD5 = sys.argv[1]
     random_int = randint(0, len(ALLCRACK))
     for i in range(len(ALLCRACK)):
         cracker = ALLCRACK[(i + random_int) % len(ALLCRACK)](MD5)
@@ -262,12 +262,13 @@ def main():
             is_success(answer)
             print('done!')
             print('the answer is %s' % answer)
-            # exit(0)
+            exit(0)
         except Exception as e:
-            print(e)
+            # print(e)
+            print('fail!')
             continue
 
-    # print('No Found This Md5!')
+    print('No Found This Md5!')
 
 if __name__ == '__main__':
     main()
