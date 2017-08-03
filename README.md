@@ -18,3 +18,6 @@ py3.x
 * [pmd5](http://pmd5.com/#)
 * [crackhash](http://crackhash.com/)
 * [iscsans](https://isc.sans.edu/tools/reversehash.html)
+
+# 用法
+python3 findmymd5.py YourMd5
