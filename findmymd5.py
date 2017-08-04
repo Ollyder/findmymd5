@@ -252,7 +252,7 @@ def main():
         exit(0)
     ALLCRACK = [HASHCRACK, HASHTOOLKIT, CMD5, DMD5, PMD5, CRACKHASH, ISCSANS]
     global MD5
-    MD5 = sys.argv[1]
+    MD5 = sys.argv[1].lower()
     random_int = randint(0, len(ALLCRACK))
     for i in range(len(ALLCRACK)):
         cracker = ALLCRACK[(i + random_int) % len(ALLCRACK)](MD5)
