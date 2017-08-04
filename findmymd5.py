@@ -8,7 +8,7 @@ try:
     from random import randint
     import sys
 except ImportError as e:
-    print("缺少必要库")
+    print(" requests , BeautifulSoup are needed.try to 'pip3 install requests beautifulsoup4'")
 
 
 MD5 = None
